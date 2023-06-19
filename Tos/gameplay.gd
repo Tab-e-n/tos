@@ -1,14 +1,5 @@
 extends Node2D
 
-@export var difficulty : int = 0
-@export var approach : int = 0
-
-var timer : float = 0
-var inputs : Array = []
-
-var overall_points : int = 0
-var point_amount : int = 0
-var hit_note_amount : int = 0
 
 const note_letters : Array = [
 	"Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P",
@@ -49,32 +40,46 @@ const note_palletes : Array = [
 	Color(0.9, 0, 0, 1),
 ]
 
-var notes : Dictionary = {
-	#hit_time : [note_type, key_type, pallete],
-	2 : [0, 0, 0],
-	3 : [0, 1, 0],
-	3.4 : [0, 2, 0],
-	3.8 : [0, 3, 0],
-	4.5 : [1, 11, 0]
-	
-}
 
-# Called when the node enters the scene tree for the first time.
+@export var difficulty : int = 0
+@export var approach : int = 0
+
+var HIT_300 : float = 0.080
+var HIT_100 : float = 0.160
+var HIT_50 : float = 0.200
+var INPUT_DROP_TIME : float = 0.280
+
+var timer : float = 0
+var inputs : Array = []
+
+var overall_points : int = 0
+var point_amount : int = 0
+var hit_note_amount : int = 0
+
+@onready var notes : Dictionary = Chart.notes.duplicate()
+
 func _ready():
-	pass # Replace with function body.
+	HIT_300 -= 0.004 * difficulty
+	HIT_100 -= 0.008 * difficulty
+	HIT_50 -= 0.010 * difficulty
+	INPUT_DROP_TIME -= 0.014 * difficulty
+	
+	#print(notes)
 
 func _input(event):
 	if event is InputEventKey:
 		inputs.append(event.duplicate())
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	timer += delta
 	#print("main ", timer)
 	
 	for i in notes.keys():
-		if i < timer + 1:
-			make_note(i, notes[i][0], notes[i][1], notes[i][2])
+		if float(i) < timer + 1:
+			if notes[i].size() == 3:
+				make_note(float(i), notes[i][0], notes[i][1], notes[i][2])
+			if notes[i].size() == 4:
+				make_note(float(i), notes[i][0], notes[i][1], notes[i][2], notes[i][3])
 			notes.erase(i)
 	
 	call_deferred("_idle")
@@ -82,18 +87,27 @@ func _process(delta):
 func _idle():
 	inputs.clear()
 
-func make_note(hit_time : float, note_type : int, key : int, pallete : int):
+func make_note(hit_time : float, note_type : int, key : int, pallete : int, duration : int = 0):
 	var new_note : Note
 	match note_type:
 		0:
 			new_note = NoteNormal.new()
 		1:
 			new_note = NoteMine.new()
+		2:
+			new_note = NoteHold.new()
 	
 	new_note.key_number = key
-	new_note.hit_time = hit_time
 	new_note.pallete = pallete
+	if note_type == 2:
+		new_note.start_time = hit_time
+		new_note.end_time = hit_time + duration
+	else:
+		new_note.hit_time = hit_time
 	add_child(new_note)
+
+func appearence_equation(hit_time : float):
+	return 1 - abs(timer - hit_time) * (1 + float(approach) / 4)
 
 func calculate_accuracy():
 	var acc_percent : float = float(overall_points) / float(point_amount * 30)
@@ -104,7 +118,7 @@ func accuracy_text(acc_percent):
 	var acc_number : float = round(acc_percent * 10000) / 100
 	$accuracy.text = String.num(acc_number)
 	
-func note_pressed_normal(points : int, pos : Vector2):
+func note_pressed(points : int, pos : Vector2):
 	overall_points += points
 	point_amount += 1
 	if points != 0:

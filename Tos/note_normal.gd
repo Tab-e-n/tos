@@ -22,7 +22,7 @@ extends Note
 @onready var border : Sprite2D = Sprite2D.new()
 @onready var hit_circle : Sprite2D = Sprite2D.new()
 @onready var inside : Sprite2D = Sprite2D.new()
-#@onready var parent : Node = get_parent()
+#@onready var root : Node = get_root()
 
 func _note_ready():
 	#hit_circle = Line2D.new()
@@ -37,7 +37,7 @@ func _note_ready():
 	
 	inside.texture = preload("res://NormalInside.png")
 	inside.position = Vector2(48, 48)
-	inside.modulate = parent.note_palletes[pallete]
+	inside.modulate = root.note_palletes[pallete]
 	inside.modulate.a = 0
 	add_child(inside)
 	
@@ -83,16 +83,16 @@ func _end_interval(disappearence : float):
 	hit_circle.scale.y = disappearence
 
 func _hit_300():
-	parent.note_pressed_normal(30, position + Vector2(48, 48))
+	root.note_pressed(30, position + Vector2(48, 48))
 
 func _hit_100():
-	parent.note_pressed_normal(10, position + Vector2(48, 48))
+	root.note_pressed(10, position + Vector2(48, 48))
 
 func _hit_50():
-	parent.note_pressed_normal(5, position + Vector2(48, 48))
+	root.note_pressed(5, position + Vector2(48, 48))
 
 func _hit_0():
-	parent.note_pressed_normal(0, position + Vector2(48, 48))
+	root.note_pressed(0, position + Vector2(48, 48))
 
 func _miss():
-	parent.note_pressed_normal(0, position + Vector2(48, 48))
+	root.note_pressed(0, position + Vector2(48, 48))

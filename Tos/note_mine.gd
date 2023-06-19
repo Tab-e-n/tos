@@ -24,13 +24,13 @@ extends Note
 func _note_ready():	
 	inside.texture = preload("res://MineInside.png")
 	inside.position = Vector2(48, 48)
-	inside.modulate = parent.note_palletes[pallete]
+	inside.modulate = root.note_palletes[pallete]
 	inside.modulate.a = 0
 	add_child(inside)
 	
 	border.texture = preload("res://MineBorder.png")
 	border.position = Vector2(48, 48)
-	border.modulate = parent.note_palletes[pallete]
+	border.modulate = root.note_palletes[pallete]
 	border.modulate.a = 0
 	add_child(border)
 	
@@ -39,7 +39,7 @@ func _note_ready():
 	main.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	main.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	main.theme = preload("res://default_theme.tres")
-	main.add_theme_color_override("font_color", parent.note_palletes[pallete])
+	main.add_theme_color_override("font_color", root.note_palletes[pallete])
 	main.clip_text = true
 	main.size = Vector2(96, 96)
 	main.modulate.a = 0
@@ -61,4 +61,4 @@ func _end_interval(disappearence : float):
 	main.modulate.a = 1 - disappearence
 
 func _hit():
-	parent.note_pressed_normal(0, position + Vector2(48, 48))
+	root.note_pressed_normal(0, position + Vector2(48, 48))

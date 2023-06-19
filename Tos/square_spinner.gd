@@ -4,16 +4,14 @@ extends Polygon2D
 @export var time : float = 0
 
 func _ready():
-	polygon.clear()
-	polygon.append(Vector2(48, 48))
-	for i in range(5):
-		polygon.append(Vector2(0, 0))
+	set_polygon([Vector2(48, 48), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0), Vector2(0, 0)])
+	
 
 func _process(_delta):
 	#time += _delta
 	#if time > 1:
 		#time -= 1
-	
+	visible = time != 0
 	if time == 1:
 		polygon[2] = Vector2(96, 0)
 		polygon[3] = Vector2(96, 96)
