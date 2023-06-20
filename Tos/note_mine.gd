@@ -55,10 +55,15 @@ func _start_interval(appearence : float):
 	border.modulate.a = appearence
 	main.modulate.a = appearence
 
+func _middle_interval():
+	inside.modulate.a = 1
+	border.modulate.a = 1
+	main.modulate.a = 1
+
 func _end_interval(disappearence : float):
 	inside.modulate.a = 1 - disappearence
 	border.modulate.a = 1 - disappearence
 	main.modulate.a = 1 - disappearence
 
 func _hit():
-	root.note_pressed_normal(0, position + Vector2(48, 48))
+	root.note_pressed(0, position + Vector2(48, 48))

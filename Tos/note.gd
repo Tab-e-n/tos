@@ -8,11 +8,13 @@ extends Node2D
 @export var pallete : int = 0
 @export var should_input_be_pressed = true
 @export var should_delete_self : bool = true
+@export var botplay : bool = false
 
 var key : String = "Q"
 var appearence : float = 0
 var disappearence : float = 0
 var pressed : bool = false
+var pressed_time : float = 0
 
 @onready var root : Node = get_tree().current_scene
 
@@ -34,60 +36,78 @@ func _process(delta):
 	if appearence <= 1 and root.timer < hit_time:
 		_start_interval(appearence)
 	
-	if appearence < 1 - root.INPUT_DROP_TIME and root.timer > hit_time:
-		if !pressed:
-			pressed = true
-			_miss()
-	
-	if pressed:
-		disappearence += delta * 4
-		_end_interval(disappearence)
+	if !botplay:
+		if appearence < 1 - root.INPUT_DROP_TIME and root.timer > hit_time:
+			if !pressed:
+				pressed = true
+				pressed_time = root.timer
+				_miss()
+		
+		if !pressed and root.timer > hit_time:
+			_middle_interval()
+		
+		if pressed:
+			disappearence = root.disappearecne_equation(pressed_time)
+			_end_interval(disappearence)
+	else:
+		if root.timer > hit_time:
+			disappearence = root.disappearecne_equation(hit_time)
+			_end_interval(disappearence)
 	
 	if disappearence >= 1 and should_delete_self:
 		queue_free()
 	
+	if appearence < 0 and should_delete_self:
+		queue_free()
+	
 	z_index += 1
 	
-	var input : InputEventKey = InputEventKey.new()
-	var input_pressed_exists : bool = false
-	var input_released_exists : bool = false
-	if !pressed and appearence > 1 - root.INPUT_DROP_TIME:
-		var pops : int = 0
-		for i in root.inputs.size():
-			if root.inputs[i - pops].as_text() == key and root.inputs[i - pops].pressed == should_input_be_pressed:
-				input = root.inputs.pop_at(i - pops)
-				pops += 1
-				if should_input_be_pressed:
-					input_pressed_exists = true
-				else:
-					input_released_exists = true
-				break;
-	
-	if input_pressed_exists:
-		_hit()
-		if appearence > 1 - root.HIT_300:
-			_hit_300()
-		elif appearence > 1 - root.HIT_100:
-			_hit_100()
-		elif appearence > 1 - root.HIT_50:
-			_hit_50()
-		else:
-			_hit_0()
-		pressed = true
-	
-	if input_released_exists:
-		_released()
-		if appearence > 1 - root.HIT_300:
-			_released_300()
-		elif appearence > 1 - root.HIT_100:
-			_released_100()
-		elif appearence > 1 - root.HIT_50:
-			_released_50()
-		else:
-			_released_0()
-		pressed = true
+	if !botplay:
+		var input : InputEventKey = InputEventKey.new()
+		var input_pressed_exists : bool = false
+		var input_released_exists : bool = false
+		if !pressed and appearence > 1 - root.INPUT_DROP_TIME:
+			var pops : int = 0
+			for i in root.inputs.size():
+				if root.inputs[i - pops].as_text() == key and root.inputs[i - pops].pressed == should_input_be_pressed:
+					input = root.inputs.pop_at(i - pops)
+					pops += 1
+					if should_input_be_pressed:
+						input_pressed_exists = true
+					else:
+						input_released_exists = true
+					break;
+		
+		if input_pressed_exists:
+			_hit()
+			if appearence > 1 - root.HIT_300:
+				_hit_300()
+			elif appearence > 1 - root.HIT_100:
+				_hit_100()
+			elif appearence > 1 - root.HIT_50:
+				_hit_50()
+			else:
+				_hit_0()
+			pressed = true
+			pressed_time = root.timer
+		
+		if input_released_exists:
+			_released()
+			if appearence > 1 - root.HIT_300:
+				_released_300()
+			elif appearence > 1 - root.HIT_100:
+				_released_100()
+			elif appearence > 1 - root.HIT_50:
+				_released_50()
+			else:
+				_released_0()
+			pressed = true
+			pressed_time = root.timer
 
 func _start_interval(appearence : float):
+	pass
+
+func _middle_interval():
 	pass
 
 func _end_interval(disappearence : float):

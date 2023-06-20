@@ -2,6 +2,8 @@ extends Control
 
 var notes : Dictionary = {
 	#hit_time : [note_type, key_type, pallete], duration],
+	1 : [1, 10, 0],
+	1.0001 : [1, 11, 0],
 	2 : [0, 0, 0],
 	3 : [0, 1, 0],
 	3.4 : [0, 2, 0],

@@ -61,11 +61,7 @@ func _note_ready():
 	main.size = Vector2(96, 96)
 	main.modulate.a = 0
 	add_child(main)
-	
-	#sprite = Sprite2D.new()
-	#sprite.modulate.a = 0
-	#sprite.texture = preload("res://icon.svg")
-	#add_child(sprite)
+
 
 func _start_interval(appearence : float):
 	inside.modulate.a = appearence
@@ -74,25 +70,38 @@ func _start_interval(appearence : float):
 	hit_circle.modulate.a = appearence
 	hit_circle.scale = Vector2(2 - appearence, 2 - appearence)
 
+
+func _middle_interval():
+	inside.modulate.a = 1
+	border.modulate.a = 1
+	main.modulate.a = 1
+	hit_circle.modulate.a = 1
+	hit_circle.scale = Vector2(1, 1)
+
+
 func _end_interval(disappearence : float):
 	inside.modulate.a = 1 - disappearence
 	border.modulate.a = 1 - disappearence
 	main.modulate.a = 1 - disappearence
 	hit_circle.modulate.a = 1 - disappearence
-	hit_circle.scale.x = disappearence
-	hit_circle.scale.y = disappearence
+	hit_circle.scale = Vector2(1 + disappearence, 1 + disappearence)
+
 
 func _hit_300():
 	root.note_pressed(30, position + Vector2(48, 48))
 
+
 func _hit_100():
 	root.note_pressed(10, position + Vector2(48, 48))
+
 
 func _hit_50():
 	root.note_pressed(5, position + Vector2(48, 48))
 
+
 func _hit_0():
 	root.note_pressed(0, position + Vector2(48, 48))
+
 
 func _miss():
 	root.note_pressed(0, position + Vector2(48, 48))

@@ -3,7 +3,6 @@ extends Note
 # Basic note that the player has to hold
 
 #@export var key_number : int = 0
-@export var start_time : float = 2
 @export var end_time : float = 3
 #@export var pallete : int = 0
 
@@ -57,23 +56,28 @@ func _note_ready():
 	add_child(main)
 	
 	note_start.key_number = key_number
-	note_start.hit_time = start_time
+	note_start.hit_time = hit_time
 	note_start.pallete = pallete
+	note_start.botplay = botplay
 	add_child(note_start)
 	
 	note_end.key_number = key_number
 	note_end.hit_time = end_time
 	note_end.pallete = pallete
+	note_end.botplay = botplay
 	add_child(note_end)
 
 func _process(delta):
-	if root.timer < start_time:
-		appearence = root.appearence_equation(start_time)
+	if root.timer < hit_time:
+		appearence = root.appearence_equation(hit_time)
 		_start_interval(appearence)
-	elif root.timer < end_time:
-		_middle_interval((root.timer - start_time) / (end_time - start_time))
 		
-		if !failed_holding and note_start.appearence < 1 - root.INPUT_DROP_TIME and note_end.appearence < 1 - root.INPUT_DROP_TIME:
+		if appearence < 0:
+			queue_free()
+	elif root.timer < end_time:
+		_middle_interval()
+		
+		if !botplay and !failed_holding and note_start.appearence < 1 - root.INPUT_DROP_TIME and note_end.appearence < 1 - root.INPUT_DROP_TIME:
 			var input : InputEventKey = InputEventKey.new()
 			var input_released_exists : bool = false
 			var pops : int = 0
@@ -88,8 +92,8 @@ func _process(delta):
 				note_pressed(0)
 				failed_holding = true
 	if root.timer > end_time:
-		if !done and hit:
-			if !failed_holding:
+		if !botplay and !done and hit:
+			if !failed_holding and note_combined_points > 0:
 				note_pressed(20)
 			var average : int = note_combined_points / 3
 			#print("avr: ", average)
@@ -103,12 +107,12 @@ func _process(delta):
 				average = 30
 			done = true
 			root.note_pressed(average, position + Vector2(48, 48))
-	if done:
-		disappearence += delta * 4
+		disappearence = root.disappearecne_equation(end_time)
 		_end_interval(disappearence)
 	
 	if disappearence >= 1:
 		queue_free()
+	
 	
 	z_index += 1
 	
@@ -145,13 +149,13 @@ func _start_interval(time : float):
 	duration.modulate.a = 0.6 * time
 	#print("start ", time)
 
-func _middle_interval(time : float):
+func _middle_interval():
 	inside.modulate.a = 1
 	border.modulate.a = 1
 	main.modulate.a = 1
 	duration.modulate.a = 0.6
 	
-	duration.time = time
+	duration.time = (root.timer - hit_time) / (end_time - hit_time)
 	#print("middle ", time)
 
 func _end_interval(time : float):

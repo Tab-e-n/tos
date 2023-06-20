@@ -1,0 +1,33 @@
+[gd_scene load_steps=2 format=3 uid="uid://j20ug6gpf35"]
+
+[ext_resource type="Script" path="res://editor.gd" id="1_gnj8p"]
+
+[node name="editor" type="Node2D"]
+script = ExtResource("1_gnj8p")
+
+[node name="explanation" type="RichTextLabel" parent="."]
+offset_right = 64.0
+offset_bottom = 64.0
+text = "time:"
+
+[node name="timer" type="RichTextLabel" parent="."]
+offset_left = 64.0
+offset_right = 384.0
+offset_bottom = 32.0
+
+[node name="mode" type="RichTextLabel" parent="."]
+offset_top = 576.0
+offset_right = 577.0
+offset_bottom = 608.0
+scale = Vector2(1.99601, 1.99668)
+bbcode_enabled = true
+text = "[center]MODE[/center]"
+scroll_active = false
+
+[node name="mode_extra" type="RichTextLabel" parent="."]
+offset_left = 448.0
+offset_top = 544.0
+offset_right = 704.0
+offset_bottom = 576.0
+bbcode_enabled = true
+scroll_active = false

@@ -1,3 +1,4 @@
+class_name NoteControl
 extends Node2D
 
 
@@ -36,18 +37,14 @@ const note_positions : Array = [
 	Vector2(682, 384),
 	Vector2(794, 384),
 ]
-const note_palletes : Array = [
+
+@export var note_palletes : Array = [
 	Color(0.9, 0, 0, 1),
 ]
-
-
 @export var difficulty : int = 0
 @export var approach : int = 0
+@export var botplay : bool = false
 
-var HIT_300 : float = 0.080
-var HIT_100 : float = 0.160
-var HIT_50 : float = 0.200
-var INPUT_DROP_TIME : float = 0.280
 
 var timer : float = 0
 var inputs : Array = []
@@ -56,13 +53,14 @@ var overall_points : int = 0
 var point_amount : int = 0
 var hit_note_amount : int = 0
 
+@onready var HIT_300 : float = 0.080 - 0.004 * difficulty
+@onready var HIT_100 : float = 0.160 - 0.008 * difficulty
+@onready var HIT_50 : float = 0.200 - 0.010 * difficulty
+@onready var INPUT_DROP_TIME : float = 0.280 - 0.014 * difficulty
 @onready var notes : Dictionary = Chart.notes.duplicate()
 
 func _ready():
-	HIT_300 -= 0.004 * difficulty
-	HIT_100 -= 0.008 * difficulty
-	HIT_50 -= 0.010 * difficulty
-	INPUT_DROP_TIME -= 0.014 * difficulty
+	pass
 	
 	#print(notes)
 
@@ -71,9 +69,19 @@ func _input(event):
 		inputs.append(event.duplicate())
 
 func _process(delta):
-	timer += delta
-	#print("main ", timer)
+	change_timer(delta)
 	
+	check_and_create_notes()
+	
+	call_deferred("_idle")
+
+func _idle():
+	inputs.clear()
+
+func change_timer(delta : float):
+	timer += delta
+
+func check_and_create_notes():
 	for i in notes.keys():
 		if float(i) < timer + 1:
 			if notes[i].size() == 3:
@@ -81,11 +89,6 @@ func _process(delta):
 			if notes[i].size() == 4:
 				make_note(float(i), notes[i][0], notes[i][1], notes[i][2], notes[i][3])
 			notes.erase(i)
-	
-	call_deferred("_idle")
-
-func _idle():
-	inputs.clear()
 
 func make_note(hit_time : float, note_type : int, key : int, pallete : int, duration : int = 0):
 	var new_note : Note
@@ -99,15 +102,17 @@ func make_note(hit_time : float, note_type : int, key : int, pallete : int, dura
 	
 	new_note.key_number = key
 	new_note.pallete = pallete
+	new_note.hit_time = hit_time
 	if note_type == 2:
-		new_note.start_time = hit_time
 		new_note.end_time = hit_time + duration
-	else:
-		new_note.hit_time = hit_time
+	new_note.botplay = botplay
 	add_child(new_note)
 
 func appearence_equation(hit_time : float):
 	return 1 - abs(timer - hit_time) * (1 + float(approach) / 4)
+
+func disappearecne_equation(pass_time : float):
+	return (timer - pass_time) * 4
 
 func calculate_accuracy():
 	var acc_percent : float = float(overall_points) / float(point_amount * 30)
@@ -117,7 +122,7 @@ func calculate_accuracy():
 func accuracy_text(acc_percent):
 	var acc_number : float = round(acc_percent * 10000) / 100
 	$accuracy.text = String.num(acc_number)
-	
+
 func note_pressed(points : int, pos : Vector2):
 	overall_points += points
 	point_amount += 1
