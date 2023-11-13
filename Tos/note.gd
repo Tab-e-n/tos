@@ -50,6 +50,8 @@ func _process(delta):
 			disappearence = root.disappearecne_equation(pressed_time)
 			_end_interval(disappearence)
 	else:
+		if root.timer == hit_time:
+			_middle_interval()
 		if root.timer > hit_time:
 			disappearence = root.disappearecne_equation(hit_time)
 			_end_interval(disappearence)

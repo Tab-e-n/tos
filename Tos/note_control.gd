@@ -38,13 +38,7 @@ const note_positions : Array = [
 	Vector2(794, 384),
 ]
 
-@export var note_palletes : Array = [
-	Color(0.9, 0, 0, 1),
-]
-@export var difficulty : int = 0
-@export var approach : int = 0
 @export var botplay : bool = false
-
 
 var timer : float = 0
 var inputs : Array = []
@@ -53,16 +47,28 @@ var overall_points : int = 0
 var point_amount : int = 0
 var hit_note_amount : int = 0
 
+
+@onready var notes : Dictionary = Chart.notes.duplicate()
+@onready var note_palletes : Array = notes["note_palletes"]
+@onready var difficulty : int = notes["difficulty"]
+@onready var approach : int = notes["approach"]
+@onready var bpm : float = notes["bpm"]
+
 @onready var HIT_300 : float = 0.080 - 0.004 * difficulty
 @onready var HIT_100 : float = 0.160 - 0.008 * difficulty
 @onready var HIT_50 : float = 0.200 - 0.010 * difficulty
 @onready var INPUT_DROP_TIME : float = 0.280 - 0.014 * difficulty
-@onready var notes : Dictionary = Chart.notes.duplicate()
 
 func _ready():
 	pass
 	
 	#print(notes)
+
+func calculate_hit_window():
+	HIT_300 = 0.080 - 0.004 * difficulty
+	HIT_100 = 0.160 - 0.008 * difficulty
+	HIT_50 = 0.200 - 0.010 * difficulty
+	INPUT_DROP_TIME = 0.280 - 0.014 * difficulty
 
 func _input(event):
 	if event is InputEventKey:
@@ -83,6 +89,8 @@ func change_timer(delta : float):
 
 func check_and_create_notes():
 	for i in notes.keys():
+		if !i.is_valid_float():
+			continue
 		if float(i) < timer + 1:
 			if notes[i].size() == 3:
 				make_note(float(i), notes[i][0], notes[i][1], notes[i][2])
